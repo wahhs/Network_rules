@@ -167,7 +167,10 @@ jobs:
           
           if ! git diff --cached --exit-code; then
             git commit -m "chore(ips): Update CN IP lists and MikroTik scripts in respective directories [skip ci]"
-            git push
+            # 使用 PAT 推送
+            # 注意：此处的 'x-access-token' 是通用的，实际值会用 secret 替换
+            git push https://x-access-token:${{ secrets.REPO_PAT }}@github.com/${{ github.repository }}.git HEAD:${{ github.ref }}
           else
             echo "No changes in files, skipping commit."
           fi
+
