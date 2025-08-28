@@ -1,0 +1,167 @@
+name: Get CN IPv4/IPv6 List and MikroTik Script
+
+on:
+  schedule:
+    - cron: '0 16 * * *' # 每天 UTC 0点运行，相当于北京时间 0点
+  workflow_dispatch:
+
+jobs:
+  get-and-process-ips:
+    runs-on: ubuntu-latest
+    
+    env:
+      MIKROTIK_ADDRESS_LIST_NAME_IPV4: "CN_IPv4_List" # MikroTik IPv4 地址列表名称
+      MIKROTIK_ADDRESS_LIST_NAME_IPV6: "CN_IPv6_List" # MikroTik IPv6 地址列表名称
+      
+      # 定义输出目录
+      IP_INFO_DIR: "apnic/CN"
+      ROUTER_DIR: "Rules/mikrotik"
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Create output directories
+        run: |
+          mkdir -p "${{ env.IP_INFO_DIR }}"
+          mkdir -p "${{ env.ROUTER_DIR }}"
+
+      - name: Fetch APNIC Delegated File
+        id: fetch_file
+        run: |
+          APNIC_FILE="delegated-apnic-latest"
+          APNIC_URL="https://ftp.apnic.net/stats/apnic/$APNIC_FILE"
+          echo "Attempting to download from $APNIC_URL"
+          curl -sS -o $APNIC_FILE $APNIC_URL
+          
+          if [ ! -s $APNIC_FILE ]; then
+            echo "Error: APNIC file download failed or file is empty."
+            exit 1
+          fi
+          echo "::set-output name=file_name::$APNIC_FILE"
+
+      - name: Process IPv4 Addresses for China
+        id: process_ipv4
+        run: |
+          APNIC_FILE=${{ steps.fetch_file.outputs.file_name }}
+          IPV4_FILE="${{ env.IP_INFO_DIR }}/cn_ipv4.txt" # 文件路径修改
+          TEMP_IPV4_FILE="temp_cn_ipv4.txt" # 临时文件仍在当前工作目录，后续会被删除
+          
+          echo "Processing IPv4 addresses..."
+          grep 'apnic|CN|ipv4|' "${APNIC_FILE}" | awk -F'|' '{print $4"/"(32-log($5)/log(2))}' > "${TEMP_IPV4_FILE}"
+          
+          if [ ! -s "${TEMP_IPV4_FILE}" ]; then
+            echo "Warning: No IPv4 addresses found for China or processing failed."
+          fi
+
+          GENERATED_TIME=$(TZ='Asia/Shanghai' date +'%Y-%m-%d %H:%M:%S %Z')
+          echo "# Generated on: ${GENERATED_TIME}" > "${IPV4_FILE}"
+          echo "# Source: APNIC delegated-apnic-latest" >> "${IPV4_FILE}"
+          echo "# Maintainer: GitHub Actions" >> "${IPV4_FILE}"
+          cat "${TEMP_IPV4_FILE}" >> "${IPV4_FILE}"
+          
+          rm "${TEMP_IPV4_FILE}"
+          echo "::set-output name=ipv4_file_name::$IPV4_FILE"
+
+      - name: Process IPv6 Addresses for China
+        id: process_ipv6
+        run: |
+          APNIC_FILE=${{ steps.fetch_file.outputs.file_name }}
+          IPV6_FILE="${{ env.IP_INFO_DIR }}/cn_ipv6.txt" # 文件路径修改
+          TEMP_IPV6_FILE="temp_cn_ipv6.txt"
+          
+          echo "Processing IPv6 addresses..."
+          grep 'apnic|CN|ipv6|' "${APNIC_FILE}" | awk -F'|' '{print $4"/"$5}' > "${TEMP_IPV6_FILE}"
+          
+          if [ ! -s "${TEMP_IPV6_FILE}" ]; then
+            echo "Warning: No IPv6 addresses found for China or processing failed."
+          fi
+          
+          GENERATED_TIME=$(TZ='Asia/Shanghai' date +'%Y-%m-%d %H:%M:%S %Z')
+          echo "# Generated on: ${GENERATED_TIME}" > "${IPV6_FILE}"
+          echo "# Source: APNIC delegated-apnic-latest" >> "${IPV6_FILE}"
+          echo "# Maintainer: GitHub Actions" >> "${IPV6_FILE}"
+          cat "${TEMP_IPV6_FILE}" >> "${IPV6_FILE}"
+          
+          rm "${TEMP_IPV6_FILE}"
+          echo "::set-output name=ipv6_file_name::$IPV6_FILE"
+
+      - name: Generate MikroTik Address List Script (IPv4)
+        id: generate_mt_ipv4
+        run: |
+          IPV4_FILE=${{ steps.process_ipv4.outputs.ipv4_file_name }}
+          MT_IPV4_SCRIPT="${{ env.ROUTER_DIR }}/mikrotik_cn_ipv4_update.rsc" # 文件路径修改
+          
+          GENERATED_TIME=$(TZ='Asia/Shanghai' date +'%Y-%m-%d %H:%M:%S %Z')
+          
+          echo "# MikroTik RouterOS Script for ${ENV.MIKROTIK_ADDRESS_LIST_NAME_IPV4}" > "${MT_IPV4_SCRIPT}"
+          echo "# Generated on: ${GENERATED_TIME}" >> "${MT_IPV4_SCRIPT}"
+          echo "# Source: APNIC delegated-apnic-latest (CN IPv4)" >> "${MT_IPV4_SCRIPT}"
+          echo "# Note: This script will first remove ALL entries from '${ENV.MIKROTIK_ADDRESS_LIST_NAME_IPV4}'" >> "${MT_IPV4_SCRIPT}"
+          echo "#       and then add new entries. Use with caution." >> "${MT_IPV4_SCRIPT}"
+          echo "" >> "${MT_IPV4_SCRIPT}"
+
+          echo "/ip firewall address-list" >> "${MT_IPV4_SCRIPT}"
+          echo "remove [find list=\"${ENV.MIKROTIK_ADDRESS_LIST_NAME_IPV4}\"]" >> "${MT_IPV4_SCRIPT}"
+
+          echo "" >> "${MT_IPV4_SCRIPT}"
+          grep -v '^#' "${IPV4_FILE}" | while read IP; do
+            echo "add list=\"${ENV.MIKROTIK_ADDRESS_LIST_NAME_IPV4}\" address=\"$IP\" comment=\"CN IP (Generated: ${GENERATED_TIME})\"" >> "${MT_IPV4_SCRIPT}"
+          done
+          
+          echo "::set-output name=mt_ipv4_script_name::$MT_IPV4_SCRIPT"
+
+      - name: Generate MikroTik Address List Script (IPv6)
+        id: generate_mt_ipv6
+        run: |
+          IPV6_FILE=${{ steps.process_ipv6.outputs.ipv6_file_name }}
+          MT_IPV6_SCRIPT="${{ env.ROUTER_DIR }}/mikrotik_cn_ipv6_update.rsc" # 文件路径修改
+          
+          GENERATED_TIME=$(TZ='Asia/Shanghai' date +'%Y-%m-%d %H:%M:%S %Z')
+          
+          echo "# MikroTik RouterOS Script for ${ENV.MIKROTIK_ADDRESS_LIST_NAME_IPV6}" > "${MT_IPV6_SCRIPT}"
+          echo "# Generated on: ${GENERATED_TIME}" >> "${MT_IPV6_SCRIPT}"
+          echo "# Source: APNIC delegated-apnic-latest (CN IPv6)" >> "${MT_IPV6_SCRIPT}"
+          echo "# Note: This script will first remove ALL entries from '${ENV.MIKROTIK_ADDRESS_LIST_NAME_IPV6}'" >> "${MT_IPV6_SCRIPT}"
+          echo "#       and then add new entries. Use with caution." >> "${MT_IPV6_SCRIPT}"
+          echo "" >> "${MT_IPV6_SCRIPT}"
+
+          echo "/ipv6 firewall address-list" >> "${MT_IPV6_SCRIPT}"
+          echo "remove [find list=\"${ENV.MIKROTIK_ADDRESS_LIST_NAME_IPV6}\"]" >> "${MT_IPV6_SCRIPT}"
+
+          echo "" >> "${MT_IPV6_SCRIPT}"
+          grep -v '^#' "${IPV6_FILE}" | while read IP; do
+            echo "add list=\"${ENV.MIKROTIK_ADDRESS_LIST_NAME_IPV6}\" address=\"$IP\" comment=\"CN IP (Generated: ${GENERATED_TIME})\"" >> "${MT_IPV6_SCRIPT}"
+          done
+          
+          echo "::set-output name=mt_ipv6_script_name::$MT_IPV6_SCRIPT"
+
+      - name: Upload IP Lists as Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: cn-ip-lists
+          path: ${{ env.IP_INFO_DIR }} # 上传整个目录
+          retention-days: 7
+
+      - name: Upload MikroTik Scripts as Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: mikrotik-scripts
+          path: ${{ env.ROUTER_DIR }} # 上传整个目录
+          retention-days: 7
+
+      - name: Commit and push files (Optional)
+        if: success()
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          
+          # 添加整个目录
+          git add "${{ env.IP_INFO_DIR }}" "${{ env.ROUTER_DIR }}"
+          
+          if ! git diff --cached --exit-code; then
+            git commit -m "chore(ips): Update CN IP lists and MikroTik scripts in respective directories [skip ci]"
+            git push
+          else
+            echo "No changes in files, skipping commit."
+          fi
