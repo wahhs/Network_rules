@@ -30,7 +30,7 @@ jobs:
         id: fetch_file
         run: |
           APNIC_FILE="delegated-apnic-latest"
-          APNIC_URL="http://ftp.apnic.net/stats/apnic/$APNIC_URL"
+          APNIC_URL="http://ftp.apnic.net/stats/apnic/delegated-apnic-latest"
           echo "Attempting to download from $APNIC_URL"
           curl -sS -o $APNIC_FILE $APNIC_URL
           
