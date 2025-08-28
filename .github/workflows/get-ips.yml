@@ -116,7 +116,7 @@ jobs:
 
           echo "" >> "${MT_IPV4_SCRIPT}"
           grep -v '^#' "${IPV4_FILE}" | while read IP; do
-            echo "add list=\"${MIKROTIK_ADDRESS_LIST_NAME_IPV4}\" address=\"$IP\" comment=\"CN IP (Generated: ${GENERATED_TIME})\"" >> "${MT_IPV4_SCRIPT}"
+            echo "add list=\"${MIKROTIK_ADDRESS_LIST_NAME_IPV4}\" address=\"$IP\"" >> "${MT_IPV4_SCRIPT}"
           done
           
           # 修复 set-output 警告
@@ -143,7 +143,7 @@ jobs:
 
           echo "" >> "${MT_IPV6_SCRIPT}"
           grep -v '^#' "${IPV6_FILE}" | while read IP; do
-            echo "add list=\"${MIKROTIK_ADDRESS_LIST_NAME_IPV6}\" address=\"$IP\" comment=\"CN IP (Generated: ${GENERATED_TIME})\"" >> "${MT_IPV6_SCRIPT}"
+            echo "add list=\"${MIKROTIK_ADDRESS_LIST_NAME_IPV6}\" address=\"$IP\"" >> "${MT_IPV6_SCRIPT}"
           done
           
           # 修复 set-output 警告
