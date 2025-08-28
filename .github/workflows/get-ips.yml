@@ -38,6 +38,12 @@ jobs:
             echo "Error: APNIC file download failed or file is empty."
             exit 1
           fi
+          echo "Downloaded APNIC file size: $(du -h $APNIC_FILE)"
+          echo "First 10 lines of APNIC file:"
+          head -n 10 $APNIC_FILE # <-- 添加这行来查看文件内容
+          echo "Last 10 lines of APNIC file:"
+          tail -n 10 $APNIC_FILE # <-- 添加这行来查看文件内容
+          echo "file_name=$APNIC_FILE" >> $GITHUB_OUTPUT
           # 修复 set-output 警告
           echo "file_name=$APNIC_FILE" >> $GITHUB_OUTPUT
 
