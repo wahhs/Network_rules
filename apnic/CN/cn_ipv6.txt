@@ -1,4 +1,4 @@
-# Generated on: 2025-10-08 00:23:02 CST
+# Generated on: 2025-10-09 00:23:10 CST
 # Source: APNIC delegated-apnic-latest
 # Maintainer: GitHub Actions
 2001:250::/35
