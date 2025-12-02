@@ -1,4 +1,4 @@
-# Generated on: 2025-12-02 00:28:11 CST
+# Generated on: 2025-12-03 00:28:35 CST
 # Source: APNIC delegated-apnic-latest
 # Maintainer: GitHub Actions
 1.0.1.0/24
@@ -6082,6 +6082,7 @@
 144.79.10.0/23
 144.79.28.0/23
 144.79.42.0/23
+144.79.54.0/23
 144.123.0.0/16
 144.255.0.0/16
 146.56.192.0/18
