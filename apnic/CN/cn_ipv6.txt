@@ -1,4 +1,4 @@
-# Generated on: 2025-12-08 00:21:58 CST
+# Generated on: 2025-12-09 00:28:01 CST
 # Source: APNIC delegated-apnic-latest
 # Maintainer: GitHub Actions
 2001:250::/35
@@ -728,6 +728,7 @@
 2402:3ba0::/32
 2402:3c00::/32
 2402:3d20::/32
+2402:3de0::/32
 2402:3e00::/32
 2402:3ec0::/32
 2402:3f80::/32
