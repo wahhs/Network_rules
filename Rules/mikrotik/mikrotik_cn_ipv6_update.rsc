@@ -1,5 +1,5 @@
 # MikroTik RouterOS Script for CN_IPv6_List
-# Generated on: 2026-02-02 00:29:45 CST
+# Generated on: 2026-02-03 00:39:55 CST
 # Source: APNIC delegated-apnic-latest (CN IPv6)
 # Note: This script will first remove ALL entries from 'CN_IPv6_List'
 #       and then add new entries. Use with caution.
@@ -750,6 +750,7 @@ add list="CN_IPv6_List" address="2402:4a80::/32"
 add list="CN_IPv6_List" address="2402:4ac0::/32"
 add list="CN_IPv6_List" address="2402:4b80::/32"
 add list="CN_IPv6_List" address="2402:4bc0::/32"
+add list="CN_IPv6_List" address="2402:4be0::/32"
 add list="CN_IPv6_List" address="2402:4c40::/32"
 add list="CN_IPv6_List" address="2402:4d80::/32"
 add list="CN_IPv6_List" address="2402:4e00::/32"
