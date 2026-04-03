@@ -1,5 +1,5 @@
 # MikroTik RouterOS Script for CN_IPv4_List
-# Generated on: 2026-04-03 00:55:48 CST
+# Generated on: 2026-04-04 00:40:15 CST
 # Source: APNIC delegated-apnic-latest (CN IPv4)
 # Note: This script will first remove ALL entries from 'CN_IPv4_List'
 #       and then add new entries. Use with caution.
@@ -6409,6 +6409,7 @@ add list="CN_IPv4_List" address="163.61.202.0/23"
 add list="CN_IPv4_List" address="163.61.214.0/23"
 add list="CN_IPv4_List" address="163.125.0.0/16"
 add list="CN_IPv4_List" address="163.128.30.0/23"
+add list="CN_IPv4_List" address="163.128.152.0/23"
 add list="CN_IPv4_List" address="163.142.0.0/16"
 add list="CN_IPv4_List" address="163.177.0.0/16"
 add list="CN_IPv4_List" address="163.179.0.0/16"
