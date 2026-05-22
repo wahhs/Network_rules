@@ -1,4 +1,4 @@
-# Generated on: 2026-05-22 01:58:00 CST
+# Generated on: 2026-05-23 01:50:08 CST
 # Source: APNIC delegated-apnic-latest
 # Maintainer: GitHub Actions
 2001:250::/35
@@ -766,6 +766,7 @@
 2402:5e00::/32
 2402:5e40::/32
 2402:5ec0::/32
+2402:5f20::/32
 2402:5f40::/32
 2402:6280::/32
 2402:62c0::/32
