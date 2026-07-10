@@ -1,5 +1,5 @@
 # MikroTik RouterOS Script for CN_IPv6_List
-# Generated on: 2026-07-10 01:55:06 CST
+# Generated on: 2026-07-11 01:46:35 CST
 # Source: APNIC delegated-apnic-latest (CN IPv6)
 # Note: This script will first remove ALL entries from 'CN_IPv6_List'
 #       and then add new entries. Use with caution.
