@@ -1,5 +1,5 @@
 # MikroTik RouterOS Script for CN_IPv4_List
-# Generated on: 2026-08-25 00:35:45 CST
+# Generated on: 2026-08-26 00:35:29 CST
 # Source: APNIC delegated-apnic-latest (CN IPv4)
 # Note: This script will first remove ALL entries from 'CN_IPv4_List'
 #       and then add new entries. Use with caution.
