@@ -1,4 +1,4 @@
-# Generated on: 2026-11-12 06:29:09 CST
+# Generated on: 2026-11-13 06:02:55 CST
 # Source: APNIC delegated-apnic-latest
 # Maintainer: GitHub Actions
 2001:250::/35
@@ -88,6 +88,7 @@
 2001:df7:1480::/48
 2001:df7:2b80::/48
 2001:df7:6600::/48
+2001:df7:d940::/48
 2001:df7:e580::/48
 2001:e08::/32
 2001:e18::/32
